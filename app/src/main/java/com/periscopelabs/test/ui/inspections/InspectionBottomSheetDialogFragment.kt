@@ -1,24 +1,27 @@
-package com.periscopelabs.test.ui.inspectiondetails
+package com.periscopelabs.test.ui.inspections
 
+import android.content.res.Resources
 import android.os.Bundle
 import android.transition.AutoTransition
 import android.transition.TransitionManager
+import android.view.LayoutInflater
 import android.view.View
-import androidx.appcompat.app.AppCompatActivity
-import androidx.constraintlayout.widget.ConstraintLayout
+import android.view.ViewGroup
 import androidx.core.view.ViewCompat
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.periscopelabs.test.R
 import com.periscopelabs.test.adapter.RoomInspectionAdapter
-import com.periscopelabs.test.databinding.ActivityInpectionDetailsBinding
+import com.periscopelabs.test.databinding.ModalDialogInspectionBinding
 import com.periscopelabs.test.models.InspectionsRoomModel
 import com.periscopelabs.test.ui.listeners.RoomInspectionItemListener
 import com.periscopelabs.test.utils.RecyclerItemTouchHelper
 
-class InspectionDetailsActivity : AppCompatActivity() {
-    private lateinit var binding: ActivityInpectionDetailsBinding
+class InspectionBottomSheetDialogFragment: BottomSheetDialogFragment() {
+    private lateinit var binding :ModalDialogInspectionBinding
     private lateinit var amAdapter: RoomInspectionAdapter
     private lateinit var bedAdapter: RoomInspectionAdapter
     private lateinit var cleanAdapter: RoomInspectionAdapter
@@ -27,11 +30,20 @@ class InspectionDetailsActivity : AppCompatActivity() {
     private val bedData: ArrayList<InspectionsRoomModel> = arrayListOf()
     private val cleanData: ArrayList<InspectionsRoomModel> = arrayListOf()
     private val livingData: ArrayList<InspectionsRoomModel> = arrayListOf()
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        binding = ActivityInpectionDetailsBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        binding = ModalDialogInspectionBinding.inflate(LayoutInflater.from(requireContext()), container, false)
+        return binding.root
+    }
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        dialog?.setOnShowListener { dialog ->
+            val bottomSheetBehavior: BottomSheetBehavior<*> = (dialog as BottomSheetDialog).behavior
+            bottomSheetBehavior.peekHeight = Resources.getSystem().displayMetrics.heightPixels
+            bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
+        }
         initRcvAm()
         initRcvClean()
         initRcvBed()
@@ -90,19 +102,19 @@ class InspectionDetailsActivity : AppCompatActivity() {
         }
 
         binding.ivBack.setOnClickListener {
-            finish()
+            dialog?.dismiss()
         }
     }
 
     private fun initRcvAm() {
-        amAdapter = RoomInspectionAdapter(this, amData, object : RoomInspectionItemListener {
+        amAdapter = RoomInspectionAdapter(requireContext(), amData, object : RoomInspectionItemListener {
             override fun onStatusButtonClick(position: Int, status: Int) {
                 amData[position].colorStatus = status
                 amAdapter.notifyItemChanged(position)
             }
         })
-        binding.rcvAmInspection.layoutManager = LinearLayoutManager(this)
-        ItemTouchHelper(RecyclerItemTouchHelper(this, amAdapter)).attachToRecyclerView(binding.rcvAmInspection)
+        binding.rcvAmInspection.layoutManager = LinearLayoutManager(requireContext())
+        ItemTouchHelper(RecyclerItemTouchHelper(requireContext(), amAdapter)).attachToRecyclerView(binding.rcvAmInspection)
         binding.rcvAmInspection.hasFixedSize()
         binding.rcvAmInspection.adapter = amAdapter
         ViewCompat.setNestedScrollingEnabled( binding.rcvAmInspection, false)
@@ -116,17 +128,17 @@ class InspectionDetailsActivity : AppCompatActivity() {
     }
 
     private fun initRcvBed() {
-        bedAdapter = RoomInspectionAdapter(this, bedData, object : RoomInspectionItemListener {
+        bedAdapter = RoomInspectionAdapter(requireContext(), bedData, object : RoomInspectionItemListener {
             override fun onStatusButtonClick(position: Int, status: Int) {
                 bedData[position].colorStatus = status
                 bedAdapter.notifyItemChanged(position)
             }
         })
-        binding.rcvBedrooms.layoutManager = LinearLayoutManager(this)
+        binding.rcvBedrooms.layoutManager = LinearLayoutManager(requireContext())
         binding.rcvBedrooms.adapter = bedAdapter
         binding.rcvBedrooms.hasFixedSize()
         ViewCompat.setNestedScrollingEnabled( binding.rcvBedrooms, false)
-        ItemTouchHelper(RecyclerItemTouchHelper(this, bedAdapter)).attachToRecyclerView(binding.rcvBedrooms)
+        ItemTouchHelper(RecyclerItemTouchHelper(requireContext(), bedAdapter)).attachToRecyclerView(binding.rcvBedrooms)
         for (i in 0..4) {
             val ins = InspectionsRoomModel("Every inch of the room has been verified", 4, 2)
             bedData.add(ins)
@@ -135,17 +147,17 @@ class InspectionDetailsActivity : AppCompatActivity() {
     }
 
     private fun initRcvClean() {
-        cleanAdapter = RoomInspectionAdapter(this, cleanData, object : RoomInspectionItemListener {
+        cleanAdapter = RoomInspectionAdapter(requireContext(), cleanData, object : RoomInspectionItemListener {
             override fun onStatusButtonClick(position: Int, status: Int) {
                 cleanData[position].colorStatus = status
                 cleanAdapter.notifyItemChanged(position)
             }
         })
-        binding.rcvCleanliness.layoutManager = LinearLayoutManager(this)
+        binding.rcvCleanliness.layoutManager = LinearLayoutManager(requireContext())
         binding.rcvCleanliness.adapter = cleanAdapter
         binding.rcvCleanliness.hasFixedSize()
         ViewCompat.setNestedScrollingEnabled( binding.rcvCleanliness, false);
-        ItemTouchHelper(RecyclerItemTouchHelper(this, cleanAdapter)).attachToRecyclerView(binding.rcvCleanliness)
+        ItemTouchHelper(RecyclerItemTouchHelper(requireContext(), cleanAdapter)).attachToRecyclerView(binding.rcvCleanliness)
 
         for (i in 0..4) {
             val ins = InspectionsRoomModel("Every inch of the room has been verified", 4, 1)
@@ -157,17 +169,17 @@ class InspectionDetailsActivity : AppCompatActivity() {
 
     private fun initRcvLiving() {
         livingAdapter =
-            RoomInspectionAdapter(this, livingData, object : RoomInspectionItemListener {
+            RoomInspectionAdapter(requireContext(), livingData, object : RoomInspectionItemListener {
                 override fun onStatusButtonClick(position: Int, status: Int) {
                     livingData[position].colorStatus = status
-                    cleanAdapter.notifyItemChanged(position)
+                    livingAdapter.notifyItemChanged(position)
                 }
             })
-        binding.rcvLivingExpense.layoutManager = LinearLayoutManager(this)
+        binding.rcvLivingExpense.layoutManager = LinearLayoutManager(requireContext())
         binding.rcvLivingExpense.adapter = livingAdapter
         binding.rcvLivingExpense.hasFixedSize()
         ViewCompat.setNestedScrollingEnabled( binding.rcvLivingExpense, false);
-        ItemTouchHelper(RecyclerItemTouchHelper(this, livingAdapter)).attachToRecyclerView(binding.rcvLivingExpense)
+        ItemTouchHelper(RecyclerItemTouchHelper(requireContext(), livingAdapter)).attachToRecyclerView(binding.rcvLivingExpense)
 
         for (i in 0..4) {
             val ins = InspectionsRoomModel("Every inch of the room has been verified", 4, 2)

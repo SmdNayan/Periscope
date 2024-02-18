@@ -16,10 +16,7 @@
             android:name=".ui.images.ImagesActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.inspectiondetails.InspectionDetailsActivity"
-            android:exported="false" />
-        <activity
-            android:name=".ui.MainActivity"
+            android:name=".ui.inspections.InspectionsActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

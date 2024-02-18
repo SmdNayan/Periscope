@@ -1,23 +1,21 @@
-package com.periscopelabs.test.ui
+package com.periscopelabs.test.ui.inspections
 
-import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.periscopelabs.test.adapter.InspectionAdapter
-import com.periscopelabs.test.databinding.ActivityMainBinding
+import com.periscopelabs.test.databinding.ActivityInspectionsBinding
 import com.periscopelabs.test.models.InspectionModel
-import com.periscopelabs.test.ui.inspectiondetails.InspectionDetailsActivity
 import com.periscopelabs.test.ui.listeners.InspectionItemClickListeners
 
-class MainActivity : AppCompatActivity(), InspectionItemClickListeners {
-    private lateinit var binding: ActivityMainBinding
+class InspectionsActivity : AppCompatActivity(), InspectionItemClickListeners {
+    private lateinit var binding: ActivityInspectionsBinding
     private lateinit var adapter: InspectionAdapter
     private val insData: ArrayList<InspectionModel> = arrayListOf()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityMainBinding.inflate(layoutInflater)
+        binding = ActivityInspectionsBinding.inflate(layoutInflater)
         setContentView(binding.root)
         initRcv()
         initData()
@@ -45,6 +43,10 @@ class MainActivity : AppCompatActivity(), InspectionItemClickListeners {
     }
 
     override fun onItemCLick(item: InspectionModel) {
-        startActivity(Intent(this, InspectionDetailsActivity::class.java))
+        val bottomDialogFragment = InspectionBottomSheetDialogFragment()
+        bottomDialogFragment.show(
+            supportFragmentManager, "InspectionDialog"
+        )
+        //startActivity(Intent(this, InspectionDetailsActivity::class.java))
     }
 }
